@@ -1,0 +1,291 @@
+
+i2c.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         0000014c  00000000  00000000  00000054  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000000  00800060  00800060  000001a0  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .comment      00000030  00000000  00000000  000001a0  2**0
+                  CONTENTS, READONLY
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  000001d0  2**2
+                  CONTENTS, READONLY
+  4 .debug_aranges 000000b8  00000000  00000000  0000020c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  5 .debug_info   0000096c  00000000  00000000  000002c4  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_abbrev 000006a3  00000000  00000000  00000c30  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_line   000004e0  00000000  00000000  000012d3  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_frame  00000148  00000000  00000000  000017b4  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_str    00000423  00000000  00000000  000018fc  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_loc    000000fc  00000000  00000000  00001d1f  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_ranges 00000098  00000000  00000000  00001e1b  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	0c 94 2a 00 	jmp	0x54	; 0x54 <__ctors_end>
+   4:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+   8:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+   c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  10:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  14:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  18:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  1c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  20:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  24:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  28:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  2c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  30:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  34:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  38:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  3c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  40:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  44:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  48:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  4c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  50:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+
+00000054 <__ctors_end>:
+  54:	11 24       	eor	r1, r1
+  56:	1f be       	out	0x3f, r1	; 63
+  58:	cf e5       	ldi	r28, 0x5F	; 95
+  5a:	d4 e0       	ldi	r29, 0x04	; 4
+  5c:	de bf       	out	0x3e, r29	; 62
+  5e:	cd bf       	out	0x3d, r28	; 61
+  60:	0e 94 8c 00 	call	0x118	; 0x118 <main>
+  64:	0c 94 a4 00 	jmp	0x148	; 0x148 <_exit>
+
+00000068 <__bad_interrupt>:
+  68:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
+
+0000006c <TWI_start>:
+	while (!(TWCR & (1<<TWINT))); // Wait till complete TWDR byte transmitted
+	while((TWSR & 0xF8) != 0x58); // Check for the acknowledgment
+	
+	return TWDR;
+
+}
+  6c:	84 ea       	ldi	r24, 0xA4	; 164
+  6e:	86 bf       	out	0x36, r24	; 54
+  70:	06 b6       	in	r0, 0x36	; 54
+  72:	07 fe       	sbrs	r0, 7
+  74:	fd cf       	rjmp	.-6      	; 0x70 <TWI_start+0x4>
+  76:	81 b1       	in	r24, 0x01	; 1
+  78:	88 7f       	andi	r24, 0xF8	; 248
+  7a:	88 30       	cpi	r24, 0x08	; 8
+  7c:	e1 f7       	brne	.-8      	; 0x76 <TWI_start+0xa>
+  7e:	08 95       	ret
+
+00000080 <TWI_init_master>:
+  80:	81 e0       	ldi	r24, 0x01	; 1
+  82:	80 b9       	out	0x00, r24	; 0
+  84:	11 b8       	out	0x01, r1	; 1
+  86:	08 95       	ret
+
+00000088 <TWI_write_address>:
+  88:	83 b9       	out	0x03, r24	; 3
+  8a:	84 e8       	ldi	r24, 0x84	; 132
+  8c:	86 bf       	out	0x36, r24	; 54
+  8e:	06 b6       	in	r0, 0x36	; 54
+  90:	07 fe       	sbrs	r0, 7
+  92:	fd cf       	rjmp	.-6      	; 0x8e <TWI_write_address+0x6>
+  94:	81 b1       	in	r24, 0x01	; 1
+  96:	88 7f       	andi	r24, 0xF8	; 248
+  98:	88 31       	cpi	r24, 0x18	; 24
+  9a:	e1 f7       	brne	.-8      	; 0x94 <TWI_write_address+0xc>
+  9c:	08 95       	ret
+
+0000009e <TWI_write_data>:
+  9e:	83 b9       	out	0x03, r24	; 3
+  a0:	84 e8       	ldi	r24, 0x84	; 132
+  a2:	86 bf       	out	0x36, r24	; 54
+  a4:	06 b6       	in	r0, 0x36	; 54
+  a6:	07 fe       	sbrs	r0, 7
+  a8:	fd cf       	rjmp	.-6      	; 0xa4 <TWI_write_data+0x6>
+  aa:	81 b1       	in	r24, 0x01	; 1
+  ac:	88 7f       	andi	r24, 0xF8	; 248
+  ae:	88 32       	cpi	r24, 0x28	; 40
+  b0:	e1 f7       	brne	.-8      	; 0xaa <TWI_write_data+0xc>
+  b2:	08 95       	ret
+
+000000b4 <TWI_stop>:
+void TWI_stop(void)
+{
+	// Clear TWI interrupt flag, Put stop condition on SDA, Enable TWI
+	TWCR= (1<<TWINT)|(1<<TWEN)|(1<<TWSTO);
+  b4:	84 e9       	ldi	r24, 0x94	; 148
+  b6:	86 bf       	out	0x36, r24	; 54
+	while(!(TWCR & (1<<TWSTO)));  // Wait till stop condition is transmitted
+  b8:	06 b6       	in	r0, 0x36	; 54
+  ba:	04 fe       	sbrs	r0, 4
+  bc:	fd cf       	rjmp	.-6      	; 0xb8 <TWI_stop+0x4>
+}
+  be:	08 95       	ret
+
+000000c0 <TWI_init_slave>:
+
+
+void TWI_init_slave(void)
+{
+	TWAR=0x20; // Fill slave address to TWAR
+  c0:	80 e2       	ldi	r24, 0x20	; 32
+  c2:	82 b9       	out	0x02, r24	; 2
+  c4:	08 95       	ret
+
+000000c6 <TWI_match_read_slave>:
+	
+}
+void TWI_match_read_slave(void)
+{
+	while((TWSR & 0xF8)!= 0x60)  // Loop till correct acknowledgment have been received
+  c6:	05 c0       	rjmp	.+10     	; 0xd2 <TWI_match_read_slave+0xc>
+	{
+		// Get acknowledgment, Enable TWI, Clear TWI interrupt flag
+		TWCR=(1<<TWEA)|(1<<TWEN)|(1<<TWINT);
+  c8:	84 ec       	ldi	r24, 0xC4	; 196
+  ca:	86 bf       	out	0x36, r24	; 54
+		while (!(TWCR & (1<<TWINT)));  // Wait for TWINT flag
+  cc:	06 b6       	in	r0, 0x36	; 54
+  ce:	07 fe       	sbrs	r0, 7
+  d0:	fd cf       	rjmp	.-6      	; 0xcc <TWI_match_read_slave+0x6>
+	TWAR=0x20; // Fill slave address to TWAR
+	
+}
+void TWI_match_read_slave(void)
+{
+	while((TWSR & 0xF8)!= 0x60)  // Loop till correct acknowledgment have been received
+  d2:	81 b1       	in	r24, 0x01	; 1
+  d4:	88 7f       	andi	r24, 0xF8	; 248
+  d6:	80 36       	cpi	r24, 0x60	; 96
+  d8:	b9 f7       	brne	.-18     	; 0xc8 <TWI_match_read_slave+0x2>
+	{
+		// Get acknowledgment, Enable TWI, Clear TWI interrupt flag
+		TWCR=(1<<TWEA)|(1<<TWEN)|(1<<TWINT);
+		while (!(TWCR & (1<<TWINT)));  // Wait for TWINT flag
+	}
+}
+  da:	08 95       	ret
+
+000000dc <TWI_read_slave>:
+char TWI_read_slave(void)
+{
+	// Clear TWI interrupt flag,Get acknowledgment, Enable TWI
+	TWCR= (1<<TWINT)|(1<<TWEA)|(1<<TWEN);
+  dc:	84 ec       	ldi	r24, 0xC4	; 196
+  de:	86 bf       	out	0x36, r24	; 54
+	while (!(TWCR & (1<<TWINT))); // Wait for TWINT flag
+  e0:	06 b6       	in	r0, 0x36	; 54
+  e2:	07 fe       	sbrs	r0, 7
+  e4:	fd cf       	rjmp	.-6      	; 0xe0 <TWI_read_slave+0x4>
+	while((TWSR & 0xF8)!=0x80); // Wait for acknowledgment
+  e6:	81 b1       	in	r24, 0x01	; 1
+  e8:	88 7f       	andi	r24, 0xF8	; 248
+  ea:	80 38       	cpi	r24, 0x80	; 128
+  ec:	e1 f7       	brne	.-8      	; 0xe6 <TWI_read_slave+0xa>
+	return TWDR; // Get value from TWDR
+  ee:	83 b1       	in	r24, 0x03	; 3
+	
+	
+}
+  f0:	08 95       	ret
+
+000000f2 <TWI_match_write_slave>:
+void TWI_match_write_slave(void)
+{
+	while((TWSR & 0xF8)!= 0xA8) // Loop till correct acknowledgment have been received
+  f2:	05 c0       	rjmp	.+10     	; 0xfe <TWI_match_write_slave+0xc>
+	{
+		// Get acknowledgment, Enable TWI, Clear TWI interrupt flag
+		TWCR=(1<<TWEA)|(1<<TWEN)|(1<<TWINT);
+  f4:	84 ec       	ldi	r24, 0xC4	; 196
+  f6:	86 bf       	out	0x36, r24	; 54
+		while (!(TWCR & (1<<TWINT)));  // Wait for TWINT flag
+  f8:	06 b6       	in	r0, 0x36	; 54
+  fa:	07 fe       	sbrs	r0, 7
+  fc:	fd cf       	rjmp	.-6      	; 0xf8 <TWI_match_write_slave+0x6>
+	
+	
+}
+void TWI_match_write_slave(void)
+{
+	while((TWSR & 0xF8)!= 0xA8) // Loop till correct acknowledgment have been received
+  fe:	81 b1       	in	r24, 0x01	; 1
+ 100:	88 7f       	andi	r24, 0xF8	; 248
+ 102:	88 3a       	cpi	r24, 0xA8	; 168
+ 104:	b9 f7       	brne	.-18     	; 0xf4 <TWI_match_write_slave+0x2>
+		// Get acknowledgment, Enable TWI, Clear TWI interrupt flag
+		TWCR=(1<<TWEA)|(1<<TWEN)|(1<<TWINT);
+		while (!(TWCR & (1<<TWINT)));  // Wait for TWINT flag
+	}
+	
+}
+ 106:	08 95       	ret
+
+00000108 <TWI_write_slave>:
+void TWI_write_slave(char data)
+{
+	TWDR= data;           // Fill TWDR register with the data to be sent
+ 108:	83 b9       	out	0x03, r24	; 3
+	TWCR= (1<<TWEN)|(1<<TWINT);   // Enable TWI, Clear TWI interrupt flag
+ 10a:	84 e8       	ldi	r24, 0x84	; 132
+ 10c:	86 bf       	out	0x36, r24	; 54
+	while((TWSR & 0xF8) != 0xC0); // Wait for the acknowledgment
+ 10e:	81 b1       	in	r24, 0x01	; 1
+ 110:	88 7f       	andi	r24, 0xF8	; 248
+ 112:	80 3c       	cpi	r24, 0xC0	; 192
+ 114:	e1 f7       	brne	.-8      	; 0x10e <TWI_write_slave+0x6>
+	
+}
+ 116:	08 95       	ret
+
+00000118 <main>:
+#include <avr/io.h>
+#include "i2c.h"
+
+int main(void)
+{
+	TWI_init_master();  // Function to initialize TWI
+ 118:	0e 94 40 00 	call	0x80	; 0x80 <TWI_init_master>
+	TWI_init_slave(); // Function to initialize slave
+ 11c:	0e 94 60 00 	call	0xc0	; 0xc0 <TWI_init_slave>
+	
+	
+    while (1) 
+    {
+		TWI_start(); // Function to send start condition
+ 120:	0e 94 36 00 	call	0x6c	; 0x6c <TWI_start>
+		TWI_write_address('a'); // Function to write address and data direction bit(write) on SDA
+ 124:	81 e6       	ldi	r24, 0x61	; 97
+ 126:	0e 94 44 00 	call	0x88	; 0x88 <TWI_write_address>
+		TWI_write_data('b');      // Function to write data in slave
+ 12a:	82 e6       	ldi	r24, 0x62	; 98
+ 12c:	0e 94 4f 00 	call	0x9e	; 0x9e <TWI_write_data>
+		TWI_stop(); // Function to send stop condition
+ 130:	0e 94 5a 00 	call	0xb4	; 0xb4 <TWI_stop>
+		
+		
+		
+		TWI_match_read_slave(); //Function to match the slave address and slave direction bit(read)
+ 134:	0e 94 63 00 	call	0xc6	; 0xc6 <TWI_match_read_slave>
+		TWI_read_slave(); // Function to read data
+ 138:	0e 94 6e 00 	call	0xdc	; 0xdc <TWI_read_slave>
+		TWI_match_write_slave(); //Function to match the slave address and slave direction bit(write)
+ 13c:	0e 94 79 00 	call	0xf2	; 0xf2 <TWI_match_write_slave>
+		TWI_write_slave('x');       // Function to write data
+ 140:	88 e7       	ldi	r24, 0x78	; 120
+ 142:	0e 94 84 00 	call	0x108	; 0x108 <TWI_write_slave>
+ 146:	ec cf       	rjmp	.-40     	; 0x120 <main+0x8>
+
+00000148 <_exit>:
+ 148:	f8 94       	cli
+
+0000014a <__stop_program>:
+ 14a:	ff cf       	rjmp	.-2      	; 0x14a <__stop_program>
